@@ -1,0 +1,2 @@
+﻿if not exist ..\artifacts mkdir ..\artifacts
+"F:\CxCache\MsBuild.Corext.15.7.177.6\v15.0\Bin\amd64\MSBuild.exe" FunctionValidator.csproj /p:webpublishmethod=filesystem;PublishUrl=..\artifacts /t:WebFileSystemPublish
