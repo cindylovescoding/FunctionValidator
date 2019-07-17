@@ -10,6 +10,9 @@ using System.Data.SqlClient;
 using System.Dynamic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Hosting;
+using System.Collections;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace FunctionValidator.Controllers
 {
@@ -25,7 +28,10 @@ namespace FunctionValidator.Controllers
         [Route("api/home")]
         public IActionResult Index()
         {
+            // https://cindydedicatedfn.scm.azurewebsites.net/functionValidator/api/home
             string siteFolder = string.Empty;
+            IDictionary appsettings = Environment.GetEnvironmentVariables();
+            
             int fileCount;
 
             if (Environment.GetEnvironmentVariable("home") != null)
@@ -48,9 +54,36 @@ namespace FunctionValidator.Controllers
                     "*.*",
                     SearchOption.AllDirectories).Length;
 
-            return View(model: fileCount);
+
+
+            return View(model: appsettings);
         }
-       
-        
+
+        private void validateStorageAccount(object sender, EventArgs e)
+        {
+            try
+            {
+                //string accountName = tbAccountName.Text;
+                //string accountKey = tbAccountKey.Text;
+
+                var storageCredentialsAccountAndKey = Environment.GetEnvironmentVariable("AzureWebJobsStorage");
+                CloudStorageAccount csa = CloudStorageAccount.Parse(storageCredentialsAccountAndKey);
+                var cloudTableClient = csa.CreateCloudTableClient();
+
+               CloudBlobClient blobClient = csa.CreateCloudBlobClient();
+                //   blobClient.ListContainersSegmentedAsync();
+                blobClient.ListContainers().Count();
+
+
+                IEnumerable<string> tableNames = cloudTableClient.ListTables();
+                int totaTables = tableNames.Count();
+                MessageBox.Show("All is well");
+            }
+            catch (Exception excep)
+            {
+                MessageBox.Show("Something is wrong");
+            }
+        }
+
     }
 }
